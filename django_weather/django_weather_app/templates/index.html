@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App using Django</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="text-center mt-20 ">
+    <h1 class="text-4xl mb-10">Weather App using Django</h1>
+    <div class="p-10 text-white max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 m-auto">
+        <article class="media">
+            <div class="media-left">
+                <figure class="image is-50x50">
+                    <img class="mx-auto mt-10 mb-5 object-cover h-16 w-32" src="http://openweathermap.org/img/w/{{ weather.icon }}.png" alt="{{ weather.description }}">
+                </figure>
+            </div>
+            <div class="media-content">
+                <div class="content">
+                    <p class="text-3xl">City: {{ weather.city }}</p>
+                    <br>
+                    <p class="text-7xl my-2">{{ weather.temperature }}°C</p>
+                    <br> 
+                    <p class="text-xl">{{ weather.description }} | Feels Like: {{ weather.feels_like }}
+                    </p>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+</body>
+</html>
