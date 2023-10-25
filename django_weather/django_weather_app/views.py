@@ -7,7 +7,7 @@ from . import api_key
 def index(request):
     # if request.method == "POST":
 
-    API_KEY = "16abde96491a8b119dd8d6e3496a4609"
+    API_KEY = api_key.API_KEY
 
     city = "Bhopal"
 
@@ -28,6 +28,24 @@ def index(request):
             "icon": data["weather"][0]["icon"],
         }
         print(weather)
+
+        # testing getting location from browser
+
+        # HTTP_X_FORWARDED_FOR header is metadata on the incoming request that contains
+        # the IP address that the request was originally sent from.
+
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(",")[0]
+
+        else:
+            # In case there is no IP address in the HTTP_X_FORWARDED_FOR header,
+            # we fall back to using the REMOTE_ADDRESS header instead,
+            # which should contain the IP of the most recent proxy that handled the request.
+            ip = request.META.get("REMOTE_ADDR")
+
+        print("IP address:", ip)
 
     else:
         weather = {
