@@ -1,17 +1,49 @@
 from django.shortcuts import render
 import requests
 from . import api_key
+import json
 
 
 # Create your views here.
 def index(request):
-    # if request.method == "POST":
+    city = ""
 
-    API_KEY = api_key.API_KEY
+    # testing getting location from browser
 
-    city = "Bhopal"
+    # HTTP_X_FORWARDED_FOR header is metadata on the incoming request that contains
+    # the IP address that the request was originally sent from.
+
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+
+    if x_forwarded_for:
+        ip = x_forwarded_for
+
+    else:
+        # In case there is no IP address in the HTTP_X_FORWARDED_FOR header,
+        # we fall back to using the REMOTE_ADDRESS header instead,
+        # which should contain the IP of the most recent proxy that handled the request.
+        ip = request.META.get("REMOTE_ADDR")
+
+    # print("IP address:", ip)
+    # ip = "49.43.41.191"
+    geolocationRes = requests.get(f"http://ip-api.com/json/{ip}")
+    geolocation = geolocationRes.text
+    conversion = json.loads(geolocation)
+
+    # print("Geolocation:", conversion)
+
+    if request.method == "POST":
+        city = request.POST.get("place")
+        # print("City from search-bar:", city)
+
+    elif conversion["status"] == "success":
+        city = conversion["city"]
+    else:
+        city = "New York"
 
     url = "https://api.openweathermap.org/data/2.5/weather"
+
+    API_KEY = api_key.API_KEY
 
     api_call = f"{url}?appid={API_KEY}&q={city}"
 
@@ -19,7 +51,8 @@ def index(request):
 
     if response.status_code == 200:
         data = response.json()
-        print("Data: ", data)
+        # print("Data: ", data)
+
         weather = {
             "city": city,
             "temperature": round(data["main"]["temp"] - 273.15, 2),
@@ -27,25 +60,7 @@ def index(request):
             "description": data["weather"][0]["description"].capitalize(),
             "icon": data["weather"][0]["icon"],
         }
-        print(weather)
-
-        # testing getting location from browser
-
-        # HTTP_X_FORWARDED_FOR header is metadata on the incoming request that contains
-        # the IP address that the request was originally sent from.
-
-        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(",")[0]
-
-        else:
-            # In case there is no IP address in the HTTP_X_FORWARDED_FOR header,
-            # we fall back to using the REMOTE_ADDRESS header instead,
-            # which should contain the IP of the most recent proxy that handled the request.
-            ip = request.META.get("REMOTE_ADDR")
-
-        print("IP address:", ip)
+        # print(weather)
 
     else:
         weather = {
